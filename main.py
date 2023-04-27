@@ -1,5 +1,6 @@
 """
  Implements a simple HTTP/1.0 Server
+
 """
 
 import socket
@@ -15,6 +16,9 @@ server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 server_socket.bind((SERVER_HOST, SERVER_PORT))
 server_socket.listen(1)
 print('Listening on port %s ...' % SERVER_PORT)
+if __name__=="__main__":
+    dict = {"/":"index.html","/index.html":'index.html', "/page2.html":"page2.html", "/hi.html":"hi.html"}
+
 
 while True:
     # Wait for client connections
@@ -28,32 +32,22 @@ while True:
     headers = request.split('\n')
     filename = headers[0].split()[1]
 
-    # Get the content of the file
 
-    if filename == '/':
-        filename = '/website.html'
 
-    # Get the content of the file
-    # fin = open('website.html')
-    # content = fin.read()
-    # fin.close()
+    # Send HTTP responses
+    try:
+        filename=dict[filename]
+        fin = open(filename)
+        content = fin.read()
+        fin.close()
+        response = 'HTTP/1.0 200 OK\n\n' + content
+    except Exception :
+        response = 'HTTP/1.0 404 NOT FOUND\n\nFile Not Found :)'
 
-    print(filename)
-    fin = open(r'C:\Users\Lenovo\Desktop\pythonProject5' + filename)
-    content = fin.read()
-    fin.close()
 
-    # website=open("website.html")
-    # content2 = website.read()
-    # website.close()
 
-    # Send HTTP response
-
-    response = 'HTTP/1.0 200 OK\n\n' + content
     client_connection.sendall(response.encode())
     client_connection.close()
 
-
-
-# Close socket
+    # Close socket
 server_socket.close()
